@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#table').DataTable({
+            "info":     false,
+            "bLengthChange": false,
+            "pageLength": 12,
+            language: {
+            	searchPlaceholder: "Search an email",
+            	search: "",
+            }
+        });
+    } );
+</script>
+<!-- Main Content -->
+<div class="main-content-wrapper">
+	<div class="main-content">
+		<h1>Mailing List</h1>
+		{% if mailing_list %}
+		<div class="project-wrapper">
+			<div class="project-backers">
+				<table class="table responsive" id="table">
+					<thead>
+						<tr>
+							<th>Email Address</th>
+							<th>Backed Projects</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for m in mailing_list %}
+						<tr>
+							<td>{{ m.email }}</td>
+							
+							<td class="images">
+								{% if m.email_backed_projects %}
+									{% for project in m.email_backed_projects %}
+										<div class="dt-project-image">
+											<img class="table-image" src="{{ project.image.url }}" alt="{{ project.title }}">
+											<span class="tooltip">{{ project.title }}</span>
+										</div>
+									{% endfor %}
+								{% else %}
+								<span class="dt-new-backer">NOT A BACKER</span>
+								{% endif %}
+							</td>
+							<td>a</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		{% else %}
+		<div class="upload-backers-list">
+			<form action="{% url 'emails' %}" method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+				{{ csvform.csv }}
+				<button type="submit" class="" id="csvUpload" name="csvUpload">Submit</button>
+			</form>
+			<span><i class="zmdi zmdi-accounts zmdi-hc-fw zmdi-hc-lg"></i><br />Click here to upload the Mailing List</span>
+		</div>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

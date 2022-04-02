@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Main Content -->
+<div class="main-content-wrapper">
+	<div class="main-content">
+		<h1>Edit Project</h1>
+		<div class="set-project-wrapper">
+			<form action="{% url 'editproject' project_id %}" method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="form-group">
+		 			<span>Title</span>
+		 			{{ form.title }}
+		 		</div>
+		 		<div class="form-group">
+		 			<span>Description</span>
+		 			{{ form.description }}
+		 		</div>
+		 		<div class="form-group">
+		 			<span>Image</span>
+		 			{{ form.image }}
+		 		</div>
+		 		<div class="form-group">
+		 			<span>Funded</span>
+		 			{{ form.funding }}
+		 		</div>
+		 		<div class="form-group">
+		 			<span>Goal</span>
+		 			{{ form.goal }}
+		 		</div>
+		 		<div class="form-group">
+		 			<span>Campaign started</span>
+		 			{{ form.started }}
+		 		</div>
+		 		<div class="form-group">
+		 			<span>Campaign ended</span>
+		 			{{ form.ended }}
+		 		</div>
+		 		<div class="form-group">
+		 			<button class="access-button" type="submit">Update</button>
+		 		</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

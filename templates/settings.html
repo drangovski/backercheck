@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Billing Types -->
+<div class="main-content-wrapper">
+	<div class="settings-wrapper">
+		<h1>Settings</h1>
+		<span>Change your account settings bellow</span>
+		<div class="main-content">
+			<div class="settings-header">
+				<div class="sh-user-cont">
+					<div class="sh-uc-userimage">
+						<form class="settings-image-form" method="POST" action="{% url 'settings' %}" enctype="multipart/form-data">
+							{% csrf_token %}
+							{{ newForm.image }}
+							<button type="submit" class="update" id="settingsImage" name="settingsImage">Update</button>
+						</form>
+						{% if user.userprofile.image.url != None %}
+						<img src="{{ user.userprofile.image.url }}" alt="">
+						{% else %}
+						<img src="{% static 'images/profile-default-image.png' %}">
+						{% endif %}
+					</div>
+					<span>{{ request.user.first_name }}</span>
+					<span>{{ request.user.last_name }}</span>
+				</div>
+			</div>
+
+			<!-- Personal Tab -->
+			<div class="settings-tabs">
+				<input class="tab-checkbox personal" type="radio" name="tabs" checked="checked" id="personal">
+				<label for="personal">Personal</label>
+				<div class="tab">
+					<div class="tab-lside">
+						<div class="settings-form">
+							<form action="{% url 'settings' %}" method="POST">
+								{% csrf_token %}
+								<div class="settings-form-group">
+									<span>FIRST NAME</span>
+									{{ form.first_name }}
+								</div>
+								<div class="settings-form-group">
+									<span>LAST NAME</span>
+									{{ form.last_name }}
+								</div>
+								<div class="settings-form-group settings-last-group">
+									<button type="submit" class="update" name="settingsPersonal">Update</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<!-- Security Tab -->
+				<input class="tab-checkbox security" type="radio" name="tabs" id="security">
+				<label for="security">Security</label>
+				<div class="tab">
+					<div class="tab-lside">
+						<div class="settings-form">
+							<form method="POST" action="{% url 'settings' %}" class="password_change">
+								{% csrf_token %}
+								<div class="settings-form-group">
+									<span>EMAIL ADDRESS</span>
+									<input type="text" name="" value="{{ request.user.email }}" disabled>
+								</div>
+								<div class="settings-form-group">
+									<span>OLD PASSWORD</span>
+									{{ changePassForm.old_password }}
+								</div>
+								<div class="settings-form-group">
+									<span>NEW PASSWORD</span>
+									{{ changePassForm.new_password1 }}
+								</div>
+								<div class="settings-form-group">
+									<span>RE-TYPE NEW PASSWORD</span>
+									{{ changePassForm.new_password2 }}
+								</div>
+								<div class="settings-form-group settings-last-group">
+									<button type="submit" class="update" name="settingsSecurity">Update</button>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="tab-rside">
+						<div class="settings-account-delete">
+							<span>Account Deletion</span>
+							<p>Permanently delete your account and related account data?</p>
+							<a class="delete-account" href="{% url 'deleteAccount' %}">Delete Account</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{% load static %}
+<div class="bic-wrapper">
+    <span>Backer #{{ backer.backer_number }}</span>
+    <h2>{{ backer.name }}</h2>
+    <div class="bic-cells">
+        <div>
+            <span>EMAIL ADDRESS</span>
+            <p>{{ backer.email }}</p>
+        </div>
+        <div>
+            <span>BACKER UID</span>
+            <p>{{ backer.backer_uid }}</p>
+        </div>
+        <div>
+            <span>SHIPPING COUNTRY</span>
+            <p>{{ backer.shipping_country }}</p>
+        </div>
+        <div>
+            <span>SHIPPING AMOUNT</span>
+            <p>{{ backer.shipping_amount }}</p>
+        </div>
+        <div>
+            <span>REWARD TITLE</span>
+            <p>{{ backer.reward_title }}</p>
+        </div>
+        <div>
+            <span>BACKING MINIMUM</span>
+            <p>{{ backer.backing_minimum }}</p>
+        </div>
+        <div>
+            <span>REWARD ID</span>
+            <p>{{ backer.reward_id }}</p>
+        </div>
+        <div>
+            <span>PLEDGE AMOUNT</span>
+            <p>{{ backer.pledge_amount }}</p>
+        </div>
+        <div>
+            <span>PLEDGED AT</span>
+            <p>{{ backer.pledged_at }}</p>
+        </div>
+        <div>
+            <span>REWARDS SENT</span>
+            <p>{{ backer.rewards_sent }}</p>
+        </div>
+        <div>
+            <span>NOTES</span>
+            <p>{{ backer.notes }}</p>
+        </div>
+    </div>
+    <div class="bic-footer">
+    {% if backer.checkMailingList %}
+        <div class="bic-mailinglist-indicator">
+            <p><i class="zmdi zmdi-email"></i></p>
+            <span class="tooltip">In mailing list</span>
+        </div>
+    {% endif %}
+    {% if backer.get_backed_project %}
+        {% for project in backer.get_backed_project %}
+        <div class="bic-project-image">
+            <img class="table-image" src="{{ project.image.url }}" alt="{{ project.title }}">
+            <span class="tooltip">Backed on {{ project.title }}</span>
+        </div>
+        {% endfor %}
+    {% else %}
+        <span class="bic-new-backer">NEW BACKER</span>
+    {% endif %}
+        <a class="bic-delete" href="{% url 'deletebacker' backer.id %}"><i class="zmdi zmdi-delete zmdi-hc-lg"></i>Delete this Backer</a>
+    </div>
+</div>

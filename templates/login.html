@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE HTML>
+<!--[if IE 9 ]>    <html lang="en" id="ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en"> <!--<![endif]-->
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Backerlist | Login</title>
+
+	<link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
+
+	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+
+</head>
+<body>
+	<!-- Login screen -->
+	<div class="login-wrapper">
+		<div class="login-illustration">
+			 <img class="login-logo" src="{% static 'images/login-logo.png' %}" alt="">
+			 <img class="login-cover" src="{% static 'images/login-cover.jpg' %}" alt="">
+		</div>
+		<div class="access-form">
+			 <div>
+			 	<h1>Log in to PBN</h1>
+			 	<form action="{% url 'login' %}" method="POST">
+			 		{% csrf_token %}
+			 		<div class="form-group">
+			 			<span>Username</span>
+			 			<input type="text" name="username" required>
+			 		</div>
+			 		<div class="form-group">
+			 			<span>Password</span>
+			 			<input type="password" name="password" required>
+			 		</div>
+			 		<div class="form-group">
+			 			<button class="access-button" type="submit">Log in</button>
+			 		</div>
+			 	</form>
+			 </div>
+		</div>
+	</div>
+</body>
+</html>

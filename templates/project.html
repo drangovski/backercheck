@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<script type="text/javascript" src="{% static 'js/alt-string.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#table').DataTable({
+			columnDefs: [
+          	{ type: 'alt-string', targets: 1 },],
+            "info":     false,
+            "bLengthChange": false,
+            "pageLength": 12,
+            language: {
+            	searchPlaceholder: "Search a Backer",
+            	search: "",
+            }
+        });
+    } );
+</script>
+<!-- Main Content -->
+<div class="main-content-wrapper">
+	<div class="main-content">
+		<div class="project-wrapper">
+			<!-- Project Header -->
+			<div class="project-header">
+				<img src="{{ project.image.url }}" alt="">
+				<div>
+					<h1>{{ project.title }}</h1>
+					<p>{{ project.description }}</p>
+				</div>
+			</div>
+		</div>
+		<!-- Project Basic Info -->
+		<div class="project-basic-info">
+			<ul>
+				<li>
+					<span>Funding</span>
+					<p>{{ project.funding }}</p>
+				</li>
+				<li>
+					<span>Goal</span>
+					<p>{{ project.goal }}</p>
+				</li>
+				<li>
+					<span>Backers</span>
+					<p>{{ current_backers.count }}</p>
+				</li>
+				<li>
+					<span>Campaign started</span>
+					<p>{{ project.started }}</p>
+				</li>
+				<li>
+					<span>Campaign ended</span>
+					<p>{{ project.ended }}</p>
+				</li>
+				<li>
+					<div class="pa-settings">
+						<span><i class="zmdi zmdi-settings zmdi-hc-lg"></i></span>
+						<div class="pa-settings-menu">
+							<a href="{% url 'editproject' project_id %}">Edit this Project</a>
+							<a href="{% url 'deleteproject' project_id %}">Delete this Project</a>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="project-wrapper">
+			<!-- Project Graphs -->
+			<div class="project-graphs">
+				<div class="project-graph-widget">
+					{% if new_backers %}
+					<canvas id="returning-new"></canvas>
+					{% else %}
+					<div class="nodata-placeholder">
+						<span><i class="zmdi zmdi-accounts-alt zmdi-hc-fw  zmdi-hc-lg"></i><br />Returning & New Visitors</span>
+						<p>Data will be visible here after the backers information for this project is uploaded.</p>
+					</div>
+					{% endif %}
+				</div>
+				<div class="project-graph-widget">
+					{% if returning_from_project %}
+					<canvas id="returning-from"></canvas>
+					{% else %}
+					<div class="nodata-placeholder">
+						<span><i class="zmdi zmdi-rotate-left zmdi-hc-fw zmdi-hc-lg"></i><br />Returning from Project</span>
+						<p>Data will be visible here after the backers information for previous project(s) is uploaded.</p>
+					</div>
+					{% endif %}
+				</div>
+				<div class="project-graph-widget">
+					{% if loc %}
+					<canvas id="location"></canvas>
+					{% else %}
+					<div class="nodata-placeholder">
+						<span><i class="zmdi zmdi-pin zmdi-hc-fw zmdi-hc-lg"></i><br />Location</span>
+						<p>Data will be visible here after the backers information for this project is uploaded.</p>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+			<!-- Project Backers -->			
+			<div class="project-backers">
+				{% if all_backers %}
+				<span class="pb-table-title">Backers list</span>
+				<table class="table responsive backers-table" id="table">
+					<thead>
+						<tr>
+							<th>Full Name</th>
+							<th>Email Address</th>
+							<th>Pledge</th>
+							<th>In Mailing list</th>
+							<th>Returning From</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for backer in all_backers %}
+						<tr>
+							<td>{{ backer.name }}</td>
+							<td>{{ backer.email }}</td>
+							<td>{{ backer.pledge_amount }}</td>
+							<td>{% if backer.checkMailingList %}<span class="dt-in-mail-list yes">YES</span>{% else %}<span class="dt-in-mail-list no">NO</span>{% endif %}</td>
+							<td class="images">
+								{% if backer.get_backed_project %}
+									{% for project in backer.get_backed_project %}
+										<div class="dt-project-image">
+											<img class="table-image" src="{{ project.image.url }}" alt="{{ project.title }}">
+											<span class="tooltip">{{ project.title }}</span>
+										</div>
+									{% endfor %}
+								{% else %}
+								<span class="dt-new-backer">NEW</span>
+								{% endif %}
+							</td>
+							<td><a class="see-backer" href="javascript:;" data-url="{% url 'backerDetails' project_id backer.id %}"><i class="zmdi zmdi-search zmdi-hc-lg"></i></a></td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				<a class="delete-backers" href="{% url 'deletebackers' project_id %}"><i class="zmdi zmdi-delete zmdi-hc-lg"></i>Delete the list</a>
+				{% else %}
+				<div class="upload-backers-list">
+					<form action="{% url 'project' project_id %}" method="POST" enctype="multipart/form-data">
+						{% csrf_token %}
+						{{ csvform.csv }}
+						<button type="submit" class="" id="csvUpload" name="csvUpload">Submit</button>
+					</form>
+					<span><i class="zmdi zmdi-accounts zmdi-hc-fw zmdi-hc-lg"></i><br />Click here to upload backers list</span>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="backer-info-container" id="backer-info-container"></div>
+
+
+<script type="text/javascript">
+	var modalDiv = $("#backer-info-container");
+	$(".see-backer").on("click", function() {
+		$.ajax({
+			url: $(this).attr("data-url"),
+			type: 'GET',
+			success: function(data) {
+				var instance = lity(data);
+				instance.opener();				
+			},
+		});
+	});
+</script>
+
+<script type="text/javascript">
+	var ctx = document.getElementById('returning-new');
+	var myChart = new Chart(ctx, {
+	    type: 'pie',
+	    data: {
+	        labels: ['Returning', 'New Backers',],
+	        datasets: [{
+	            label: '# of Votes',
+	            data: [{{ count_returning }}, {{ count_new }},],
+	            backgroundColor: [
+	           		'rgba(184, 228, 242, 1)',
+	                'rgba(125, 202, 226, 1)',
+	            ],
+	            borderWidth: 0
+	        }]
+	    }
+	});
+</script>
+<script type="text/javascript">
+	const labels = [{% for project in returning_from_project %}'{{ project }}',{% endfor %}];
+	const images = [{% for project in returning_from_project %}'{{ project.image.url }}',{% endfor %}];
+	const values = [{% for project in returning_from_project %}'{{ project.project_count }}',{% endfor %}];
+
+	var ctx = document.getElementById('returning-from');
+	var myChart = new Chart(ctx, {
+		type: 'bar',
+		plugins: [{
+			afterDraw: chart => {      
+			
+			var ctx = chart.chart.ctx; 
+			var xAxis = chart.scales['x-axis-0'];
+			var yAxis = chart.scales['y-axis-0'];
+			xAxis.ticks.forEach((value, index) => {  
+				var x = xAxis.getPixelForTick(index);      
+				var image = new Image();
+				image.src = images[index],
+				ctx.drawImage(image, x - 25, yAxis.bottom + 10, image.width='50', image.height='50');
+			});      
+			}
+		}],
+	    data: {
+	        labels: labels,
+	        datasets: [{
+	            label: 'Returning from project',
+	            data: values,
+	            backgroundColor: [
+	           		'rgba(184, 228, 242, 1)',
+	                'rgba(125, 202, 226, 1)',
+	            ],
+				borderWidth: 0,
+	        }]
+	    },
+		options: {
+			responsive: true,
+			layout: {
+				padding: {
+					bottom: 100
+				}
+			},
+	        scales: {
+		        xAxes: [{
+					barThickness: 50,
+		            gridLines: {
+		                display:false,
+		                drawBorder: false,
+		            },
+		            ticks: {
+			            display:false,
+			        }
+		        }],
+		        yAxes: [{
+		            gridLines: {
+		                display:false,
+		                drawBorder: false,
+		            },
+		            ticks: {
+						display:false,
+						min: 0
+			        } 
+		        }],
+		    }
+	    }
+	});
+</script>
+<script type="text/javascript">
+	var ctx = document.getElementById('location');
+	var myChart = new Chart(ctx, {
+	    type: 'horizontalBar',
+	    data: {
+	        labels: [{% for l in loc %}'{{ l.shipping_country }}',{% endfor %}],
+	        datasets: [{
+	            label: 'Total backers',
+	            data: [{% for l in loc %}'{{ l.loc_count }}',{% endfor %}],
+	            backgroundColor: [
+					{% for l in loc %}
+						'rgba(125, 202, 226, 1)',
+					{% endfor %}
+	            ],
+	            borderWidth: 0
+	        }],
+	    },
+	    options: {
+	        scales: {
+		        xAxes: [{
+		            gridLines: {
+		                display:false,
+		                drawBorder: false,
+		            },
+		            ticks: {
+						display:false,
+						min: 0
+			        } 
+		        }],
+		        yAxes: [{
+		            gridLines: {
+		                display:false,
+		                drawBorder: false,
+		            }
+		        }]
+		    }
+	    }
+	});
+</script>
+{% endblock %}

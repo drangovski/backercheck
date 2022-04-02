@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Main Content -->
+<div class="main-content-wrapper">
+	<div class="main-content">
+		<h1>Projects</h1>
+		<!-- Projects -->
+		<div class="projects-container">
+			<ul>
+				{% for p in projects %}
+				<li><a class="" href="{% url 'project' p.id %}"><img src="{{ p.image.url }}" alt="project"></a></li>
+				{% endfor %}
+				<li><a class="add-project" href="{% url 'addproject' %}">+</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+{% endblock %}
